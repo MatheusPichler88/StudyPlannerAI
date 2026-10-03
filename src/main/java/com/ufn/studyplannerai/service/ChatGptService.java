@@ -6,6 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,23 +34,18 @@ public class ChatGptService {
                         materia.getDataProva()))
                 .collect(Collectors.joining("\n"));
         String prompt = """
-                Atue como um professor e orientador de estudos. Monte um cronograma baseado nos dados:
-                
-                - Data Atual: %s
-                - Horas Disponíveis por Dia: %dh
-                - Matérias com Prova Futura:
-                %s
-                
-                REGRAS:
-                1. Use APENAS as matérias fornecidas, sem inventar outras.
-                2. Priorize provas mais próximas e matérias de maior dificuldade.
-                3. Respeite o limite diário de horas e reserve a véspera de cada prova para revisão.
-                
-                ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
-                1. Visão geral das prioridades
-                2. Cronograma dia a dia até a próxima prova
-                3. Dicas de método de estudo para cada matéria
-                """;
+        Atue como um professor e orientador de estudos.
+        Crie um cronograma de estudos com base nas seguintes matérias:
+
+        - Data Atual: %s
+        - Lista de Matérias:
+        %s
+
+        INSTRUÇÕES PARA O TESTE:
+        - Não peça nenhuma informação adicional, gere a resposta diretamente.
+        - Monte o planejamento priorizando as provas mais próximas.
+        - Dê dicas de estudo simples para cada matéria.
+                """.formatted(LocalDate.now(), materias);
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o-mini",
                 "messages", List.of(
